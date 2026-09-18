@@ -6,47 +6,55 @@ __pycache__/
 *.pyd
 *.py~
 *.py.class
-.Python
-env/
+*.py.backup
+*.swp
+*.swo
+
+# Virtual environments
 venv/
 .venv/
-.ENV
-.venv.bak/
-pip-log.txt
-pip-selfcheck.json
-.pytest_cache/
+env/
+.ENV/
+env.bak/
+venv.bak/
+
+# Dependencies
+Pipfile.lock
+poetry.lock
+requirements.txt
+*.egg-info/
+.eggs/
 .mypy_cache/
-.coverage
-coverage.xml
-htmlcov/
+.pytest_cache/
 .tox/
-.nox/
+.coverage
+coverage/
 
-# Alembic
-alembic/
+# Build and distribution artifacts
+build/
+dist/
+*.egg
+*.whl
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
 
-# Docker
-.dockerenv
-Dockerfile*
-docker-compose*
+# Alembic migrations
+migrations/versions/
+*.db
+*.db-journal
 
 # Logs
 *.log
 
-# Environment variables
-.env
-.env.local
-.env.*
-!.env.example
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Icon?
 ```
