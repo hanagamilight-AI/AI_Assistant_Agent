@@ -33,8 +33,8 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: ../docker/Dockerfile.backend
+      context: ..
+      dockerfile: docker/Dockerfile.backend
     container_name: personal-assistant-backend
     environment:
       DATABASE_URL: postgresql+asyncpg://personal_assistant:${POSTGRES_PASSWORD:-devpassword}@postgres:5432/personal_assistant
@@ -49,13 +49,14 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+      - ../backend:/app
+    working_dir: /app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../docker/Dockerfile.frontend
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
     container_name: personal-assistant-frontend
     environment:
       VITE_API_URL: http://localhost:8000/api/v1
@@ -64,8 +65,9 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app
+      - ../frontend:/app
       - /app/node_modules
+    working_dir: /app
     command: npm run dev -- --host
 
 volumes:
