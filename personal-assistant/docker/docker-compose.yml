@@ -1,30 +1,24 @@
-version: '3.8'
-
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: personal-assistant-db
+  db:
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: personal_assistant
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
-      POSTGRES_DB: personal_assistant
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: assistant
+      POSTGRES_PASSWORD: assistant_password
+      POSTGRES_DB: assistant_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U personal_assistant"]
+      test: ["CMD-SHELL", "pg_isready -U assistant"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: personal-assistant-redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -35,45 +29,24 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.backend
-    container_name: personal-assistant-backend
+    env_file:
+      - ../backend/.env
     environment:
-      DATABASE_URL: postgresql+asyncpg://personal_assistant:${POSTGRES_PASSWORD:-devpassword}@postgres:5432/personal_assistant
-      REDIS_URL: redis://redis:6379/0
-      APP_ENV: development
-      DEBUG: true
-    ports:
-      - "8000:8000"
+      DATABASE_URL: postgresql+asyncpg://assistant:assistant_password@db:5432/assistant_db
+      REDIS_URL: redis://redis:6379
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    ports:
+      - "8000:8000"
     volumes:
       - ../backend:/app
-    working_dir: /app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-  frontend:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.frontend
-    container_name: personal-assistant-frontend
-    environment:
-      VITE_API_URL: http://localhost:8000/api/v1
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    volumes:
-      - ../frontend:/app
-      - /app/node_modules
-    working_dir: /app
-    command: npm run dev -- --host
+      - ./mcp_config:/app/mcp_config
+    command: >
+      sh -c "alembic upgrade head && python -m app.main"
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-  redis_data:
-
-networks:
-  default:
-    name: personal-assistant-network
