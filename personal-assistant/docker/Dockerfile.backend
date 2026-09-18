@@ -18,10 +18,8 @@ RUN pip install --no-cache-dir -e .
 # Copy application code
 COPY backend/ ./
 
-# Ensure alembic.ini exists and has correct script_location
-RUN if [ -f alembic.ini ]; then \
-      sed -i 's|script_location = .*|script_location = migrations|g' alembic.ini; \
-    fi
+# Move alembic.ini to root and ensure correct script_location
+RUN if [ -f migrations/alembic.ini ]; then cp migrations/alembic.ini . && sed -i 's|script_location = .*|script_location = migrations|g' alembic.ini; fi
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
