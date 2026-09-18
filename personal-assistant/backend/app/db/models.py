@@ -139,7 +139,7 @@ class Message(Base):
     )
     role: Mapped[str] = mapped_column(String(50), nullable=False)  # user, assistant, system
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    message_metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -174,7 +174,7 @@ class Task(Base):
     priority: Mapped[str] = mapped_column(String(50), default="medium")  # low, medium, high
     due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    entry_metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -214,7 +214,7 @@ class Memory(Base):
     memory_type: Mapped[str] = mapped_column(String(50), nullable=False)  # preference, fact, instruction, context
     importance_score: Mapped[float] = mapped_column(default=0.5)
     source: Mapped[str | None] = mapped_column(String(255), nullable=True)  # conversation, manual, extracted
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    entry_metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -252,7 +252,7 @@ class Document(Base):
     file_type: Mapped[str] = mapped_column(String(50), nullable=False)  # pdf, txt, md, docx, csv, json
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
     content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    entry_metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -290,7 +290,7 @@ class DocumentChunk(Base):
         JSONB,
         nullable=True,
     )  # Stored as array, consider using pgvector
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    entry_metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -365,7 +365,7 @@ class AuditLog(Base):
     request_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(Text, nullable=True)
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    entry_metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
