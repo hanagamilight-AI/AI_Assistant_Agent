@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "personal-assistant"
 version = "0.1.0"
 description = "AI Personal Assistant Agent - A production-oriented AI assistant for digital work and personal tasks"
-readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
@@ -37,6 +36,8 @@ dependencies = [
     "httpx>=0.26.0",
     "redis>=5.0.0",
     "structlog>=24.1.0",
+    "openai>=1.10.0",
+    "groq>=0.4.0",
 ]
 
 [project.optional-dependencies]
@@ -47,11 +48,6 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
     "pre-commit>=3.6.0",
-]
-
-llm = [
-    "openai>=1.10.0",
-    "anthropic>=0.8.0",
 ]
 
 rag = [
@@ -67,11 +63,11 @@ mcp = [
 ]
 
 all = [
-    "personal-assistant[dev,llm,rag,mcp]",
+    "personal-assistant[dev,rag,mcp]",
 ]
 
 [tool.setuptools.packages.find]
-where = ["backend"]
+where = ["."]
 include = ["app*"]
 
 [tool.ruff]
