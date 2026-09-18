@@ -1,39 +1,28 @@
-# Backend Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including build tools for SQLite
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    libpq-dev \
+    libsqlite3-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY backend/pyproject.toml .
+# Copy pyproject.toml for dependency installation
+COPY backend/pyproject.toml ./pyproject.toml
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
-# Copy application code including migrations
-COPY backend/ ./
+# Copy application code
+COPY backend/app ./app
 
-# Copy alembic.ini to root directory (Alembic expects it there or in current working directory)
-COPY backend/migrations/alembic.ini ./alembic.ini
+# Create data directory for SQLite database
+RUN mkdir -p /app/data
 
-# Ensure script_location points to the migrations directory
-RUN sed -i 's|^script_location = .*|script_location = migrations|g' alembic.ini
+# Set environment variables
+ENV PYTHONPATH=/app
 
-# Create non-root user
-RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
-USER appuser
-
-# Expose port
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import httpx; httpx.get('http://localhost:8000/api/v1/health')" || exit 1
-
-# Run application with migration check
-CMD sh -c "if [ -d migrations ] && [ -f alembic.ini ]; then echo 'Migrations directory found'; else echo 'No migrations'; fi && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+# Run database migrations and start the application
+CMD uvicorn app.main:app --host 0.0.0.0 --port 8000
