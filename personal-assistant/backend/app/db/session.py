@@ -20,12 +20,18 @@ class Base(DeclarativeBase):
 
 
 # Create async engine with connection pooling
+# SQLite requires specific connect_args for proper async support
+connect_args = {}
+if settings.database_url.startswith("sqlite+"):
+    connect_args["check_same_thread"] = False
+
 engine = create_async_engine(
     str(settings.database_url),
     echo=settings.debug,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    connect_args=connect_args,
+    pool_pre_ping=True if not settings.database_url.startswith("sqlite+") else False,
+    pool_size=10 if not settings.database_url.startswith("sqlite+") else 5,
+    max_overflow=20 if not settings.database_url.startswith("sqlite+") else 10,
 )
 
 # Create async session factory
