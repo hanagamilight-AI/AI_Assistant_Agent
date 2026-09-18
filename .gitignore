@@ -1,60 +1,68 @@
 ```
-# Python
+# Dependencies
+node_modules/
+.venv/
+venv/
 __pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+
+# Build artifacts
+dist/
+build/
 *.pyc
-*.pyo
-*.pyd
-*.py~
-*.py.class
-*.py.backup
+*.class
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# Virtual environments
-venv/
-.venv/
-env/
-.ENV/
-env.bak/
-venv.bak/
-
-# Dependencies
-Pipfile.lock
-poetry.lock
-requirements.txt
-*.egg-info/
-.eggs/
-.mypy_cache/
-.pytest_cache/
-.tox/
-.coverage
-coverage/
-
-# Build and distribution artifacts
-build/
-dist/
-*.egg
-*.whl
-*.zip
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-
-# Alembic migrations
-migrations/versions/
-*.db
-*.db-journal
-
-# Logs
+# Logs and temp files
 *.log
+*.tmp
 
-# OS generated files
+# System
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-Icon?
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
 ```

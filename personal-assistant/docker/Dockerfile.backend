@@ -18,9 +18,10 @@ RUN pip install --no-cache-dir -e .
 # Copy application code
 COPY backend/ ./
 
-# Ensure alembic.ini is in the right place and has correct script_location
-# The script_location should be relative to where alembic.ini is located
-RUN sed -i 's|script_location = migrations/versions|script_location = ./migrations/versions|g' /app/alembic.ini
+# Ensure alembic.ini exists and has correct script_location
+RUN if [ -f alembic.ini ]; then \
+      sed -i 's|script_location = .*|script_location = migrations|g' alembic.ini; \
+    fi
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
@@ -33,5 +34,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import httpx; httpx.get('http://localhost:8000/api/v1/health')" || exit 1
 
-# Run application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run application with migration check
+CMD sh -c "if [ -d migrations ] && [ -f alembic.ini ]; then echo 'Migrations directory found'; else echo 'No migrations'; fi && uvicorn app.main:app --host 0.0.0.0 --port 8000"
