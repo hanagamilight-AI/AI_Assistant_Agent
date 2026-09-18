@@ -1,186 +1,226 @@
 # AI Personal Assistant Agent
 
-A production-oriented AI Personal Assistant Agent that acts as a central interface for a user's digital work and personal tasks.
+A production-oriented AI Personal Assistant accessible via Telegram bot that acts as a central interface for your digital work and personal tasks.
 
 ## Features
 
-- **Natural Language Understanding**: Understand and process natural-language requests
-- **Context Management**: Maintain short-term and long-term context
-- **Information Retrieval**: Retrieve information from connected data sources via RAG
-- **Tool Execution**: Use tools to perform actions with proper validation
-- **Multi-step Planning**: Break complex requests into multiple steps
-- **Verification**: Verify important tool results before responding
-- **Confirmation System**: Ask for confirmation before sensitive or irreversible actions
-- **Audit Trail**: Keep an auditable record of important actions
-- **Extensible Architecture**: Add new tools and data sources without rewriting the core agent
+- **Natural Language Understanding**: Understands and responds to natural-language requests
+- **Task Management**: Create, update, and track tasks
+- **Conversation Memory**: Maintains short-term and long-term context
+- **Tool Integration**: Extensible tool system for calendar, email, documents, etc.
+- **Telegram Bot Interface**: Access your assistant directly from Telegram
+- **MCP Support**: Model Context Protocol for external tools and data sources
+- **RAG Ready**: Document retrieval and semantic search capabilities
+
+## Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Python 3.11+ (for local development)
+- A Telegram account (for bot access)
+- An LLM API key (OpenAI or compatible)
+
+### 1. Clone and Configure
+
+```bash
+cd personal-assistant/backend
+cp .env.example .env
+```
+
+Edit `.env` and add your API keys:
+
+```bash
+LLM_API_KEY=your-openai-api-key
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+```
+
+### 2. Start with Docker
+
+```bash
+cd ../docker
+docker-compose up -d
+```
+
+### 3. Set up Telegram Webhook
+
+For local development using ngrok:
+
+```bash
+# In a new terminal
+ngrok http 8000
+
+# Copy the HTTPS URL and set webhook
+curl -X POST http://localhost:8000/api/v1/telegram/set-webhook
+```
+
+Or if you have a public domain:
+
+```bash
+curl -X POST https://your-domain.com/api/v1/telegram/set-webhook
+```
+
+### 4. Chat with Your Bot
+
+1. Open Telegram
+2. Search for your bot by username
+3. Start chatting! Try:
+   - "Create a task to finish the API documentation tomorrow"
+   - "What meetings do I have tomorrow?"
+   - "Help me prepare for tomorrow's client meeting"
 
 ## Architecture
 
 ```
-                         ┌─────────────────────┐
-                         │        User         │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │   API / Chat UI     │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │  Assistant Service  │
-                         └──────────┬──────────┘
-                                    │
-                   ┌────────────────┼────────────────┐
-                   │                │                │
-                   ▼                ▼                ▼
-             ┌───────────┐   ┌────────────┐   ┌────────────┐
-             │  Memory   │   │   Agent    │   │   RAG      │
-             │  Service  │   │  Runtime   │   │  Service   │
-             └───────────┘   └─────┬──────┘   └────────────┘
-                                   │
-                      ┌────────────┼────────────┐
-                      │            │            │
-                      ▼            ▼            ▼
-                 ┌────────┐   ┌────────┐   ┌──────────┐
-                 │ Tools  │   │  MCP   │   │ Planner  │
-                 └────┬───┘   └────┬───┘   └──────────┘
-                      │            │
-             ┌────────┼────────────┼───────────────┐
-             │        │            │               │
-             ▼        ▼            ▼               ▼
-          Calendar   Email      Database       Documents
+┌─────────────┐
+│   Telegram  │
+│     Bot     │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  FastAPI    │
+│   Backend   │
+└──────┬──────┘
+       │
+   ┌───┴───┐
+   │       │
+   ▼       ▼
+┌─────┐ ┌──────┐
+│Agent│ │ Tools│
+└──┬──┘ └──┬───┘
+   │       │
+   ▼       ▼
+┌─────┐ ┌──────┐
+│ LLM │ │ MCP  │
+└─────┘ └──────┘
 ```
-
-## Tech Stack
-
-### Backend
-- Python 3.11+
-- FastAPI
-- Pydantic
-- SQLAlchemy
-- PostgreSQL
-- Redis (optional for caching/session state)
-
-### Frontend
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-
-### Agent/LLM
-- Pluggable LLM provider abstraction
-- Support for OpenAI-compatible providers and local models
 
 ## Project Structure
 
 ```
 personal-assistant/
-│
 ├── backend/
 │   ├── app/
-│   │   ├── api/
-│   │   ├── agent/
-│   │   ├── tools/
-│   │   ├── mcp/
-│   │   ├── memory/
-│   │   ├── rag/
-│   │   ├── llm/
-│   │   ├── security/
-│   │   ├── db/
-│   │   ├── config.py
-│   │   └── main.py
-│   ├── tests/
-│   ├── migrations/
-│   ├── pyproject.toml
-│   └── .env.example
-│
-├── frontend/
-│   ├── src/
-│   ├── package.json
-│   └── .env.example
-│
+│   │   ├── api/routes/      # REST API endpoints
+│   │   ├── agent/           # Agent state and prompts
+│   │   ├── tools/           # Tool implementations
+│   │   ├── llm/             # LLM provider abstraction
+│   │   ├── db/              # Database models and repositories
+│   │   └── main.py          # Application entry point
+│   ├── tests/               # Test suites
+│   └── .env                 # Environment configuration
 ├── docker/
-│   └── docker-compose.yml
-│
-├── docs/
-│
-├── README.md
-└── .gitignore
-```
-
-## Quick Start
-
-### Prerequisites
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL
-- Docker (optional)
-
-### Backend Setup
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -e .
-cp .env.example .env
-# Edit .env with your configuration
-python -m uvicorn app.main:app --reload
-```
-
-### Frontend Setup
-
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
-```
-
-### Docker Setup
-
-```bash
-docker-compose up -d
+│   ├── docker-compose.yml   # Docker services
+│   └── Dockerfile.backend   # Backend container
+├── docs/                    # Documentation
+└── README.md
 ```
 
 ## Configuration
 
-See `.env.example` files in both backend and frontend directories for required environment variables.
+### Environment Variables
 
-Key configuration options:
-- `DATABASE_URL`: PostgreSQL connection string
-- `LLM_PROVIDER`: LLM provider name
-- `LLM_API_KEY`: API key for LLM provider
-- `LLM_MODEL`: Model identifier
-- `JWT_SECRET`: Secret for JWT authentication
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `LLM_API_KEY` | OpenAI or compatible API key | Yes |
+| `LLM_MODEL` | Model name (e.g., gpt-4o-mini) | No (default: gpt-4o-mini) |
+| `DATABASE_URL` | PostgreSQL connection string | No (Docker default provided) |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token | For Telegram access |
+| `TELEGRAM_WEBHOOK_URL` | Public webhook URL | For production |
 
-## Documentation
+See `backend/.env.example` for all options.
 
-- [Architecture](docs/architecture.md)
-- [Tools](docs/tools.md)
-- [Memory System](docs/memory.md)
-- [Security](docs/security.md)
+## API Endpoints
+
+### Chat
+- `POST /api/v1/chat` - Send a message and get response
+
+### Conversations
+- `GET /api/v1/conversations` - List conversations
+- `GET /api/v1/conversations/{id}` - Get conversation details
+- `DELETE /api/v1/conversations/{id}` - Delete conversation
+
+### Tasks
+- `GET /api/v1/tasks` - List tasks
+- `POST /api/v1/tasks` - Create task
+- `PATCH /api/v1/tasks/{id}` - Update task
+- `DELETE /api/v1/tasks/{id}` - Delete task
+
+### Telegram
+- `POST /api/v1/telegram/webhook` - Receive Telegram updates
+- `POST /api/v1/telegram/set-webhook` - Configure webhook
+- `GET /api/v1/telegram/webhook-info` - Get webhook status
+
+### Health
+- `GET /api/v1/health` - Health check
+- `GET /api/v1/health/ready` - Readiness check
 
 ## Development
+
+### Local Setup (without Docker for app)
+
+```bash
+# Install dependencies
+cd backend
+pip install -e ".[dev]"
+
+# Start PostgreSQL and Redis
+docker-compose -f docker/docker-compose.yml up -d db redis
+
+# Run migrations
+alembic upgrade head
+
+# Start backend
+python -m app.main
+```
 
 ### Running Tests
 
 ```bash
 cd backend
 pytest
+```
+
+### Code Quality
+
+```bash
 ruff check .
 mypy .
 ```
 
-### Frontend Development
+## Documentation
 
-```bash
-cd frontend
-npm run lint
-npm run build
-```
+- [Architecture](docs/architecture.md) - System design and components
+- [Tools](docs/tools.md) - Tool system guide
+- [Memory](docs/memory.md) - Memory architecture
+- [Security](docs/security.md) - Security best practices
+- [Telegram Setup](docs/telegram_setup.md) - Complete Telegram bot setup guide
+
+## Roadmap
+
+- [x] Core agent architecture
+- [x] Telegram bot integration
+- [x] Task management tools
+- [ ] Calendar integration
+- [ ] Email integration
+- [ ] Document RAG system
+- [ ] MCP server support
+- [ ] Multi-step planning
+- [ ] Advanced memory management
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
 ## License
 
-MIT
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions, please open an issue on GitHub.
