@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY pyproject.toml .
+COPY backend/pyproject.toml .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
 # Copy application code
-COPY . .
+COPY backend/ ./
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
