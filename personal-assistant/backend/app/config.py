@@ -8,7 +8,7 @@ All configuration values are loaded from environment variables with sensible def
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, PostgresDsn, RedisDsn
+from pydantic import Field, PostgresDsn, RedisDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -34,11 +34,19 @@ class Settings(BaseSettings):
     host: str = Field(default="0.0.0.0", description="Server host")
     port: int = Field(default=8000, description="Server port")
 
-    # Database
-    database_url: PostgresDsn = Field(
-        default="postgresql+asyncpg://user:password@localhost:5432/personal_assistant",
-        description="PostgreSQL database URL",
+    # Database - supports both PostgreSQL and SQLite
+    database_url: str = Field(
+        default="sqlite+aiosqlite:///./personal_assistant.db",
+        description="Database URL (PostgreSQL or SQLite)",
     )
+
+    @field_validator("database_url")
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
+        """Validate database URL format."""
+        if not v.startswith(("postgresql+", "sqlite+")):
+            raise ValueError("Database URL must start with 'postgresql+' or 'sqlite+'")
+        return v
 
     # Redis (optional)
     redis_url: RedisDsn | None = Field(
@@ -47,8 +55,8 @@ class Settings(BaseSettings):
     )
 
     # LLM Configuration
-    llm_provider: Literal["openai", "anthropic", "local"] = Field(
-        default="openai",
+    llm_provider: Literal["openai", "groq", "anthropic", "local"] = Field(
+        default="groq",
         description="LLM provider",
     )
     llm_api_key: str = Field(
@@ -125,10 +133,18 @@ class Settings(BaseSettings):
     )
 
     # CORS
-    allowed_origins: list[str] = Field(
-        default=["http://localhost:3000", "http://localhost:5173"],
-        description="Allowed CORS origins",
+    allowed_origins: str = Field(
+        default="http://localhost:3000,http://localhost:5173",
+        description="Allowed CORS origins (comma-separated)",
     )
+
+    @field_validator("allowed_origins")
+    @classmethod
+    def parse_allowed_origins(cls, v: str) -> list[str]:
+        """Parse comma-separated origins into a list."""
+        if isinstance(v, list):
+            return v
+        return [origin.strip() for origin in v.split(",") if origin.strip()]
 
     @property
     def is_production(self) -> bool:
