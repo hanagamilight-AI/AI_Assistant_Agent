@@ -1,26 +1,27 @@
 ```
+# Docker related
+.dockerenv
+Dockerfile.*
+docker-compose.*
+
 # Dependencies
 node_modules/
 .venv/
 venv/
 __pycache__/
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
-
-# Build artifacts
+*.egg-info/
 dist/
 build/
-*.pyc
-*.class
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
+target/
+.gradle/
+.mypy_cache/
+.pytest_cache/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
 
 # Environment
 .env
@@ -33,11 +34,7 @@ build/
 *.swp
 *.swo
 
-# Logs and temp files
-*.log
-*.tmp
-
-# System
+# OS
 .DS_Store
 Thumbs.db
 
@@ -46,7 +43,18 @@ coverage/
 htmlcov/
 .coverage
 
-# Compressed files
+# Compiled files
+*.pyc
+*.class
+*.o
+*.exe
+*.dll
+*.so
+*.a
+*.obj
+*.out
+
+# Archives
 *.zip
 *.gz
 *.tar
@@ -65,4 +73,8 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
