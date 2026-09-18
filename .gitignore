@@ -1,48 +1,71 @@
 ```
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
-env/
-venv/
-.venv/
-.ENV
-.ENV.*
-.env
-.env.*
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/modules/
-.pytest_cache/
-.hypothesis/
-.eggs/
+build/
+develop-eggs/
+dist/
+downloads/
 eggs/
-parts/
-.sconf_temp/
-.scrapy
-.coverage
-.coverage.*
-.cache
-.installed.cfg
+.eggs/
 lib/
 lib64/
-pip-wheel-metadata/
-req/
-requirements.txt
+parts/
+sdist/
 var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Database migrations
+*.db
+*.db-journal
+
+# Docker
+.dockerenv
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
-*~
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pytest
+.pytest_cache/
+
+# Alembic
+alembic/versions/*.py
+
+# OS
 .DS_Store
 Thumbs.db
 ```

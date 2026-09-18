@@ -15,11 +15,14 @@ COPY backend/pyproject.toml .
 # Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
-# Copy application code
+# Copy application code including migrations
 COPY backend/ ./
 
-# Move alembic.ini to root and ensure correct script_location
-RUN if [ -f migrations/alembic.ini ]; then cp migrations/alembic.ini . && sed -i 's|script_location = .*|script_location = migrations|g' alembic.ini; fi
+# Copy alembic.ini to root directory (Alembic expects it there or in current working directory)
+COPY backend/migrations/alembic.ini ./alembic.ini
+
+# Ensure script_location points to the migrations directory
+RUN sed -i 's|^script_location = .*|script_location = migrations|g' alembic.ini
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
